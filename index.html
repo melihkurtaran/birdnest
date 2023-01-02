@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>NDZ Violations</h1>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Distance (m)</th>
+        </tr>
+        {% for pilot in pilots %}
+            <tr>
+                <td>{{ pilot.name }}</td>
+                <td>{{ pilot.email }}</td>
+                <td>{{ pilot.phone }}</td>
+                <td>{{ pilot.distance }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
