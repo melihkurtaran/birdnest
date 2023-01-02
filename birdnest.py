@@ -1,29 +1,3 @@
-import requests
-import xml.etree.ElementTree as ET
-
-# URL for the snapshot endpoint
-snapshot_url = "https://assignments.reaktor.com/birdnest/drones"
-
-
-# Send a GET request to the snapshot endpoint
-response = requests.get(snapshot_url)
-
-# Parse the XML data
-root = ET.fromstring(response.text)
-
-# Extract the drone information from the XML data
-drones = []
-for drone in root.findall("./capture/drone"):
-    serial_number = drone.find("serialNumber").text
-    x = float(drone.find("positionX").text)
-    y = float(drone.find("positionY").text)
-    drones.append({"serial_number": serial_number, "x": x, "y": y})
-
-# Calculate the distance of each drone from the NDZ perimeter
-ndz_x = 250000
-ndz_y = 250000
-ndz_radius = 100000 # limit is 100 meter
-
 from flask import Flask, render_template
 import requests
 import xml.etree.ElementTree as ET
@@ -51,7 +25,6 @@ def index():
         x = float(drone.find("positionX").text)
         y = float(drone.find("positionY").text)
         drones.append({"serial_number": serial_number, "x": x, "y": y})
-
     # Calculate the distance of each drone from the NDZ perimeter
     ndz_x = 250000
     ndz_y = 250000
@@ -64,7 +37,7 @@ def index():
 
     # Filter the drones to only include those that have violated the NDZ
     violators = [drone for drone in drones if drone["distance"] < ndz_radius]
-    
+
     # Query the registry endpoint for each violator and extract the pilot information
     pilots = []
     for drone in violators:
@@ -84,26 +57,6 @@ def index():
             print("There is a violation but the violator is UNKNOWN!")
 
 
-    # Generate the HTML for the user interface
-    html = "<html><head><title>NDZ Violations</title></head><body>"
-    html += "<h1>NDZ Violations</h1>"
-
-    # Add a table to display the violator information
-    html += "<table>"
-    html += "<tr><th>Name</th><th>Email</th><th>Phone</th><th>Distance (m)</th></tr>"
-
-    # Add a row for each violator
-    for pilot in pilots:
-        html += "<tr>"
-        html += f"<td>{pilot['name']}</td>"
-        html += f"<td>{pilot['email']}</td>"
-        html += f"<td>{pilot['phone']}</td>"
-        html += f"<td>{pilot['distance']}</td>"
-        html += "</tr>"
-
-    html += "</table>"
-    html += "</body></html>"
-
-    # Display the HTML
-    print(html)
+    # Render the HTML template with the violator data
+    return render_template("index.html", pilots=pilots)
 
