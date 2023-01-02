@@ -60,3 +60,5 @@ def index():
     # Render the HTML template with the violator data
     return render_template("index.html", pilots=pilots)
 
+if __name__ == '__main__':
+    app.run()
