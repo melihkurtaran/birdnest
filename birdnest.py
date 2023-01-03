@@ -1,34 +1,30 @@
+from flask import Flask, render_template, jsonify
 import requests
 import xml.etree.ElementTree as ET
-
-# URL for the snapshot endpoint
-snapshot_url = "https://assignments.reaktor.com/birdnest/drones"
-
-
-# Send a GET request to the snapshot endpoint
-response = requests.get(snapshot_url)
-
-# Parse the XML data
-root = ET.fromstring(response.text)
-
-# Extract the drone information from the XML data
-drones = []
-for drone in root.findall("./capture/drone"):
-    serial_number = drone.find("serialNumber").text
-    x = float(drone.find("positionX").text)
-    y = float(drone.find("positionY").text)
-    drones.append({"serial_number": serial_number, "x": x, "y": y})
-
-# Calculate the distance of each drone from the NDZ perimeter
-ndz_x = 250000
-ndz_y = 250000
-ndz_radius = 100000 # limit is 100 meter
-
-from flask import Flask, render_template
-import requests
-import xml.etree.ElementTree as ET
+import sqlite3
 
 app = Flask(__name__)
+
+# Connect to the database
+conn = sqlite3.connect('pilots.db')
+
+# Create a cursor
+cursor = conn.cursor()
+
+# Create the table
+cursor.execute("""CREATE TABLE IF NOT EXISTS pilots (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    email TEXT,
+                    phone TEXT,
+                    distance REAL,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                )""")
+# Save the changes
+conn.commit()
+
+# Close the connection
+conn.close()
 
 # URL for the snapshot endpoint
 snapshot_url = "https://assignments.reaktor.com/birdnest/drones"
@@ -38,11 +34,15 @@ registry_url = "https://assignments.reaktor.com/birdnest/pilots/{serial_number}"
 
 @app.route('/')
 def index():
+    return render_template("index.html")
+
+@app.route('/data')
+def data():
     # Send a GET request to the snapshot endpoint
     response = requests.get(snapshot_url)
 
     # Parse the XML data
-    root = ET.fromstring(response.text)
+    root = ET.fromstring(response.text.encode('utf-8'))
 
     # Extract the drone information from the XML data
     drones = []
@@ -64,7 +64,7 @@ def index():
 
     # Filter the drones to only include those that have violated the NDZ
     violators = [drone for drone in drones if drone["distance"] < ndz_radius]
-    
+
     # Query the registry endpoint for each violator and extract the pilot information
     pilots = []
     for drone in violators:
@@ -82,28 +82,12 @@ def index():
         #Please note on a rare occasion pilot information may not be found, indicated by a 404 status code.
         if response.status_code == 404:
             print("There is a violation but the violator is UNKNOWN!")
+    
+    #pilots info sorted starting from shortest distance
+    pilots = sorted(pilots, key=lambda pilot: pilot['distance'])
+
+    return jsonify(pilots)
 
 
-    # Generate the HTML for the user interface
-    html = "<html><head><title>NDZ Violations</title></head><body>"
-    html += "<h1>NDZ Violations</h1>"
-
-    # Add a table to display the violator information
-    html += "<table>"
-    html += "<tr><th>Name</th><th>Email</th><th>Phone</th><th>Distance (m)</th></tr>"
-
-    # Add a row for each violator
-    for pilot in pilots:
-        html += "<tr>"
-        html += f"<td>{pilot['name']}</td>"
-        html += f"<td>{pilot['email']}</td>"
-        html += f"<td>{pilot['phone']}</td>"
-        html += f"<td>{pilot['distance']}</td>"
-        html += "</tr>"
-
-    html += "</table>"
-    html += "</body></html>"
-
-    # Display the HTML
-    print(html)
-
+if __name__ == '__main__':
+    app.run()
