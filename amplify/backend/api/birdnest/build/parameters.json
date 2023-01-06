@@ -1,0 +1,7 @@
+{
+    "AppSyncApiName": "birdnest",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "S3DeploymentBucket": "amplify-birdnest-dev-162002-deployment",
+    "S3DeploymentRootKey": "amplify-appsync-files/315af389dd41116792cc7907c46e89cdafe10a3f"
+}

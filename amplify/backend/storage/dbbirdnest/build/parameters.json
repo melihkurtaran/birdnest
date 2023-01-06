@@ -1,0 +1,7 @@
+{
+  "tableName": "pilot",
+  "partitionKeyName": "ID",
+  "partitionKeyType": "N",
+  "sortKeyName": "distance",
+  "sortKeyType": "N"
+}

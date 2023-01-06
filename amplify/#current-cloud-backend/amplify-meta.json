@@ -1,0 +1,15 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-birdnest-dev-162002-authRole",
+      "UnauthRoleArn": "arn:aws:iam::226260016445:role/amplify-birdnest-dev-162002-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::226260016445:role/amplify-birdnest-dev-162002-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-birdnest-dev-162002-deployment",
+      "UnauthRoleName": "amplify-birdnest-dev-162002-unauthRole",
+      "StackName": "amplify-birdnest-dev-162002",
+      "StackId": "arn:aws:cloudformation:eu-north-1:226260016445:stack/amplify-birdnest-dev-162002/d53af270-8dc4-11ed-a2f9-0ec7e0c04542",
+      "AmplifyAppId": "dgfp0d311cyws"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "resourceName": "dbbirdnest",
+  "tableName": "pilot",
+  "partitionKey": {
+    "fieldName": "ID",
+    "fieldType": "number"
+  },
+  "sortKey": {
+    "fieldName": "distance",
+    "fieldType": "number"
+  },
+  "gsi": [],
+  "triggerFunctions": [
+    "dbbirdnestTrigger3c47a129"
+  ]
+}
